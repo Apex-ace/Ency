@@ -8,4 +8,6 @@ services:
       - key: PYTHON_VERSION
         value: 3.11.0
       - key: FLASK_ENV
-        value: production 
+        value: production
+      - key: PYTHONPATH
+        value: ${RENDER_PROJECT_DIR} 
