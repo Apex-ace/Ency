@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Ticket - {{ booking.event.name }}</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Outfit', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #fff;
+        }
+
+        .ticket-container {
+            width: 800px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            border: 2px solid #3b82f6;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .ticket-header {
+            background: linear-gradient(45deg, #3b82f6, #8b5cf6);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .ticket-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .ticket-subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+
+        .ticket-body {
+            padding: 30px;
+            position: relative;
+        }
+
+        .ticket-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .info-group {
+            margin-bottom: 15px;
+        }
+
+        .info-label {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .info-value {
+            font-size: 16px;
+            color: #1f2937;
+            font-weight: 500;
+        }
+
+        .ticket-qr {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            width: 120px;
+            height: 120px;
+            background: #fff;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .ticket-footer {
+            border-top: 2px dashed #e5e7eb;
+            padding: 20px;
+            text-align: center;
+            background: #f9fafb;
+        }
+
+        .ticket-note {
+            font-size: 14px;
+            color: #6b7280;
+            margin: 0;
+        }
+
+        .ticket-id {
+            font-family: monospace;
+            font-size: 14px;
+            color: #6b7280;
+            margin-top: 10px;
+        }
+
+        .ticket-divider {
+            position: relative;
+            height: 30px;
+            background: transparent;
+        }
+
+        .ticket-divider::before,
+        .ticket-divider::after {
+            content: '';
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: #fff;
+            border-radius: 50%;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .ticket-divider::before {
+            left: -15px;
+            border-right: 2px dashed #e5e7eb;
+        }
+
+        .ticket-divider::after {
+            right: -15px;
+            border-left: 2px dashed #e5e7eb;
+        }
+
+        .event-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .organizer-info {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+            font-size: 14px;
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body>
+    <div class="ticket-container">
+        <div class="ticket-header">
+            <h1 class="ticket-title">{{ booking.event.name }}</h1>
+            <p class="ticket-subtitle">{{ booking.event.category }}</p>
+        </div>
+
+        <div class="ticket-body">
+            {% if booking.event.image_url %}
+            <img src="{{ booking.event.image_url }}" alt="Event Image" class="event-image">
+            {% endif %}
+
+            <div class="ticket-info">
+                <div>
+                    <div class="info-group">
+                        <div class="info-label">Attendee</div>
+                        <div class="info-value">{{ booking.name }}</div>
+                    </div>
+                    <div class="info-group">
+                        <div class="info-label">Date & Time</div>
+                        <div class="info-value">{{ booking.event.date.strftime('%B %d, %Y at %I:%M %p') }}</div>
+                    </div>
+                    <div class="info-group">
+                        <div class="info-label">Venue</div>
+                        <div class="info-value">{{ booking.event.venue }}</div>
+                    </div>
+                </div>
+                <div>
+                    <div class="info-group">
+                        <div class="info-label">Ticket Type</div>
+                        <div class="info-value">{% if booking.is_group %}Group Ticket{% else %}Individual Ticket{% endif %}</div>
+                    </div>
+                    {% if booking.is_group %}
+                    <div class="info-group">
+                        <div class="info-label">Group Size</div>
+                        <div class="info-value">{{ booking.group_size }} members</div>
+                    </div>
+                    {% endif %}
+                    <div class="info-group">
+                        <div class="info-label">Price</div>
+                        <div class="info-value">₹{{ "%.2f"|format(booking.event.price) }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ticket-qr">
+                <!-- QR Code will be inserted here -->
+                <img src="{{ qr_code }}" alt="Ticket QR Code" width="120" height="120">
+            </div>
+
+            <div class="organizer-info">
+                <p>Organized by: {{ booking.event.organizer.username }}</p>
+                <p>Contact: {{ booking.event.organizer.email }}</p>
+            </div>
+        </div>
+
+        <div class="ticket-divider"></div>
+
+        <div class="ticket-footer">
+            <p class="ticket-note">This ticket is valid for one-time entry only. Please present this ticket at the venue.</p>
+            <p class="ticket-id">Booking ID: {{ booking.id }}</p>
+        </div>
+    </div>
+</body>
+</html> 

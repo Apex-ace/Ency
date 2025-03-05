@@ -1,0 +1,146 @@
+{% macro notification_item(notification) %}
+<div class="glass p-4 rounded-lg mb-4 relative {% if not notification.read %}border-l-4 border-green-500{% endif %}">
+    <div class="flex items-start">
+        {% if notification.type == 'event_update' %}
+            <svg class="w-6 h-6 text-green-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/>
+            </svg>
+        {% elif notification.type == 'booking_confirmation' %}
+            <svg class="w-6 h-6 text-green-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+        {% elif notification.type == 'reminder' %}
+            <svg class="w-6 h-6 text-green-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+        {% else %}
+            <svg class="w-6 h-6 text-green-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+        {% endif %}
+        
+        <div class="flex-grow">
+            <h4 class="text-white font-medium mb-1">{{ notification.title }}</h4>
+            <p class="text-gray-400 text-sm">{{ notification.content }}</p>
+            <div class="mt-2 flex items-center text-xs text-gray-500">
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                {{ notification.timestamp.strftime('%B %d, %Y at %I:%M %p') }}
+            </div>
+        </div>
+        
+        {% if not notification.read %}
+            <div class="absolute top-4 right-4">
+                <span class="bg-green-500 text-black text-xs px-2 py-1 rounded-full">New</span>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endmacro %}
+
+{% macro notification_badge(count) %}
+{% if count > 0 %}
+<span class="absolute -top-1 -right-1 bg-green-500 text-black text-xs w-5 h-5 flex items-center justify-center rounded-full">
+    {{ count if count <= 99 else '99+' }}
+</span>
+{% endif %}
+{% endmacro %}
+
+{% macro notification_preferences_form(preferences) %}
+<div class="glass p-6 rounded-lg">
+    <h3 class="text-lg font-semibold mb-4">Notification Preferences</h3>
+    <form method="POST" action="{{ url_for('notification_preferences') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        
+        <div class="space-y-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <label class="text-white font-medium">Email Notifications</label>
+                    <p class="text-sm text-gray-400">Receive notifications via email</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" name="email_notifications" class="sr-only peer" 
+                           {% if preferences.email_notifications %}checked{% endif %}>
+                    <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer 
+                              peer-checked:after:translate-x-full peer-checked:after:border-white 
+                              after:content-[''] after:absolute after:top-[2px] after:left-[2px] 
+                              after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all 
+                              peer-checked:bg-green-500"></div>
+                </label>
+            </div>
+            
+            <div class="flex items-center justify-between">
+                <div>
+                    <label class="text-white font-medium">SMS Notifications</label>
+                    <p class="text-sm text-gray-400">Receive notifications via SMS</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" name="sms_notifications" class="sr-only peer"
+                           {% if preferences.sms_notifications %}checked{% endif %}>
+                    <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer 
+                              peer-checked:after:translate-x-full peer-checked:after:border-white 
+                              after:content-[''] after:absolute after:top-[2px] after:left-[2px] 
+                              after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all 
+                              peer-checked:bg-green-500"></div>
+                </label>
+            </div>
+            
+            <div class="flex items-center justify-between">
+                <div>
+                    <label class="text-white font-medium">Event Updates</label>
+                    <p class="text-sm text-gray-400">Receive updates about events you're attending</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" name="event_updates" class="sr-only peer"
+                           {% if preferences.event_updates %}checked{% endif %}>
+                    <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer 
+                              peer-checked:after:translate-x-full peer-checked:after:border-white 
+                              after:content-[''] after:absolute after:top-[2px] after:left-[2px] 
+                              after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all 
+                              peer-checked:bg-green-500"></div>
+                </label>
+            </div>
+            
+            <div class="flex items-center justify-between">
+                <div>
+                    <label class="text-white font-medium">Event Reminders</label>
+                    <p class="text-sm text-gray-400">Receive reminders before events</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" name="event_reminders" class="sr-only peer"
+                           {% if preferences.event_reminders %}checked{% endif %}>
+                    <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer 
+                              peer-checked:after:translate-x-full peer-checked:after:border-white 
+                              after:content-[''] after:absolute after:top-[2px] after:left-[2px] 
+                              after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all 
+                              peer-checked:bg-green-500"></div>
+                </label>
+            </div>
+            
+            <div class="flex items-center justify-between">
+                <div>
+                    <label class="text-white font-medium">Messages</label>
+                    <p class="text-sm text-gray-400">Receive notifications for new messages</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" name="messages" class="sr-only peer"
+                           {% if preferences.messages %}checked{% endif %}>
+                    <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer 
+                              peer-checked:after:translate-x-full peer-checked:after:border-white 
+                              after:content-[''] after:absolute after:top-[2px] after:left-[2px] 
+                              after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all 
+                              peer-checked:bg-green-500"></div>
+                </label>
+            </div>
+        </div>
+        
+        <div class="mt-6">
+            <button type="submit" 
+                    class="w-full bg-green-500 text-black px-6 py-2 rounded-full font-semibold hover:bg-green-400 transition-colors">
+                Save Preferences
+            </button>
+        </div>
+    </form>
+</div>
+{% endmacro %} 

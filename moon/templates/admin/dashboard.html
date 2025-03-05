@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Encypherist - Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #000;
+            color: white;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(45deg, #000000, #1a1a1a);
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .gradient-text {
+            background: linear-gradient(45deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stats-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .activity-item {
+            border-left: 2px solid rgba(59, 130, 246, 0.3);
+            padding-left: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #3b82f6, #8b5cf6);
+            border: none;
+            border-radius: 12px;
+            padding: 0.75rem 1.5rem;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <nav class="fixed w-full z-50 glass">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-8">
+                    <a href="{{ url_for('admin_dashboard') }}" class="text-3xl font-bold gradient-text">Admin Dashboard</a>
+                    <a href="{{ url_for('admin_events') }}" class="hover:text-blue-400 transition">Events</a>
+                    <a href="{{ url_for('admin_users') }}" class="hover:text-blue-400 transition">Users</a>
+                    <a href="{{ url_for('activity_log') }}" class="hover:text-blue-400 transition">Activity Log</a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="{{ url_for('home') }}" class="hover:text-blue-400 transition">View Site</a>
+                    <form action="{{ url_for('logout') }}" method="POST" class="inline">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="hover:text-blue-400 transition">Logout</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mx-auto px-6 pt-24 pb-12">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="mb-6 p-4 rounded-lg bg-blue-500 bg-opacity-20 text-blue-200 text-center">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="stats-card p-6">
+                <h3 class="text-lg font-semibold mb-2">Total Users</h3>
+                <p class="text-3xl font-bold gradient-text">{{ total_users }}</p>
+            </div>
+            <div class="stats-card p-6">
+                <h3 class="text-lg font-semibold mb-2">Total Events</h3>
+                <p class="text-3xl font-bold gradient-text">{{ total_events }}</p>
+            </div>
+            <div class="stats-card p-6">
+                <h3 class="text-lg font-semibold mb-2">Total Bookings</h3>
+                <p class="text-3xl font-bold gradient-text">{{ total_bookings }}</p>
+            </div>
+            <div class="stats-card p-6">
+                <h3 class="text-lg font-semibold mb-2">Pending Events</h3>
+                <p class="text-3xl font-bold gradient-text">{{ pending_events }}</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <div class="glass p-6">
+                <h3 class="text-xl font-semibold mb-4">Events by Category</h3>
+                <canvas id="eventsByCategoryChart"></canvas>
+            </div>
+            <div class="glass p-6">
+                <h3 class="text-xl font-semibold mb-4">Bookings Timeline</h3>
+                <canvas id="bookingsTimelineChart"></canvas>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="glass p-6 lg:col-span-2">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-semibold">Recent Activity</h3>
+                    <a href="{{ url_for('activity_log') }}" class="text-blue-400 hover:text-blue-300">View All</a>
+                </div>
+                <div class="space-y-4">
+                    {% for activity in recent_activities %}
+                    <div class="activity-item">
+                        <p class="text-sm text-gray-400">{{ activity.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                        <p class="font-medium">{{ activity.description }}</p>
+                        <p class="text-sm text-gray-400">Type: {{ activity.activity_type }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="glass p-6">
+                <h3 class="text-xl font-semibold mb-4">Quick Actions</h3>
+                <div class="space-y-4">
+                    <a href="{{ url_for('admin_events') }}" class="btn-primary block text-center">Manage Events</a>
+                    <a href="{{ url_for('admin_users') }}" class="btn-primary block text-center">Manage Users</a>
+                    <a href="{{ url_for('generate_report') }}?type=events" class="btn-primary block text-center">Generate Report</a>
+                    <a href="{{ url_for('create_backup') }}" class="btn-primary block text-center">Create Backup</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Events by Category Chart
+        const categoryCtx = document.getElementById('eventsByCategoryChart').getContext('2d');
+        new Chart(categoryCtx, {
+            type: 'doughnut',
+            data: {
+                labels: {{ events_by_category|map(attribute=0)|list|tojson }},
+                datasets: [{
+                    data: {{ events_by_category|map(attribute=1)|list|tojson }},
+                    backgroundColor: [
+                        'rgba(59, 130, 246, 0.8)',
+                        'rgba(139, 92, 246, 0.8)',
+                        'rgba(16, 185, 129, 0.8)',
+                        'rgba(239, 68, 68, 0.8)',
+                        'rgba(245, 158, 11, 0.8)'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: 'white'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Bookings Timeline Chart
+        const timelineCtx = document.getElementById('bookingsTimelineChart').getContext('2d');
+        new Chart(timelineCtx, {
+            type: 'line',
+            data: {
+                labels: {{ bookings_by_date|map(attribute=0)|list|tojson }},
+                datasets: [{
+                    label: 'Bookings',
+                    data: {{ bookings_by_date|map(attribute=1)|list|tojson }},
+                    borderColor: 'rgba(59, 130, 246, 1)',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            color: 'white'
+                        },
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            color: 'white'
+                        },
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: 'white'
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html> 

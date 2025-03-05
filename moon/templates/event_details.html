@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% set bg_color = config.THEME.background_color if config.THEME else "#000000" %}
+{% set text_color = config.THEME.text_color if config.THEME else "#FFFFFF" %}
+{% set primary_color = config.THEME.primary_color if config.THEME else "#00FF00" %}
+{% set secondary_color = config.THEME.secondary_color if config.THEME else "#000000" %}
+{% set accent_color = config.THEME.accent_color if config.THEME else "#1a1a1a" %}
+
+<style>
+    body {
+        background-color: "{{ bg_color|safe }}";
+        color: "{{ text_color|safe }}";
+    }
+    .card {
+        background-color: "{{ accent_color|safe }}";
+        border: 1px solid "{{ primary_color|safe }}";
+    }
+    .btn-primary {
+        background-color: "{{ primary_color|safe }}";
+        border-color: "{{ primary_color|safe }}";
+    }
+    .btn-primary:hover {
+        background-color: "{{ secondary_color|safe }}";
+        border-color: "{{ primary_color|safe }}";
+    }
+    .form-control, .form-select {
+        background-color: "{{ bg_color|safe }}";
+        color: "{{ text_color|safe }}";
+        border: 1px solid "{{ primary_color|safe }}";
+    }
+    .form-control:focus, .form-select:focus {
+        background-color: "{{ bg_color|safe }}";
+        color: "{{ text_color|safe }}";
+        border-color: "{{ primary_color|safe }}";
+        box-shadow: 0 0 0 0.25rem rgba(0, 255, 0, 0.25);
+    }
+    .alert {
+        border-color: "{{ primary_color|safe }}";
+    }
+    .list-group-item {
+        background-color: "{{ accent_color|safe }}";
+        color: "{{ text_color|safe }}";
+        border-color: "{{ primary_color|safe }}";
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h2>{{ event.title }}</h2>
+        </div>
+        <div class="card-body">
+            <p class="card-text">{{ event.description }}</p>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">Location: {{ event.location }}</li>
+                <li class="list-group-item">Date: {{ event.date.strftime('%B %d, %Y at %I:%M %p') }}</li>
+                <li class="list-group-item">Price: ${{ "%.2f"|format(event.price) }}</li>
+                <li class="list-group-item">Available Tickets: {{ event.remaining_tickets }}</li>
+            </ul>
+            
+            {% if event.poster_image %}
+            <div class="mb-4">
+                <img src="{{ url_for('static', filename=event.poster_image) }}" 
+                     alt="Event poster" 
+                     class="img-fluid rounded">
+            </div>
+            {% endif %}
+            
+            {% if current_user.is_authenticated and current_user.role == 'student' %}
+                <div class="mt-3">
+                    <a href="{{ url_for('book_event', event_id=event.id) }}" class="btn btn-primary">Book Now</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

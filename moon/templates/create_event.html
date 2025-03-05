@@ -1,0 +1,376 @@
+{% extends "base.html" %}
+
+{% block title %}Create Event{% endblock %}
+
+{% block extra_head %}
+<style>
+    :root {
+        --primary-color: #60A5FA;
+        --secondary-color: #1E40AF;
+        --accent-color: #2563EB;
+        --text-color: #FFFFFF;
+        --background-color: #0F172A;
+        --baby-blue: #93C5FD;
+        --light-blue: #BFDBFE;
+    }
+
+    body {
+        font-family: 'Outfit', sans-serif;
+        background-color: var(--background-color);
+        color: var(--text-color);
+        min-height: 100vh;
+        margin: 0;
+        padding: 0;
+        background: linear-gradient(45deg, var(--secondary-color), var(--accent-color));
+    }
+
+    .glass {
+        background: rgba(147, 197, 253, 0.05);
+        backdrop-filter: blur(10px);
+        border: 1px solid var(--primary-color);
+        border-radius: 24px;
+        box-shadow: 0 8px 32px rgba(147, 197, 253, 0.1);
+    }
+
+    .gradient-text {
+        background: linear-gradient(45deg, var(--primary-color), var(--baby-blue));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .input-field {
+        background: rgba(147, 197, 253, 0.05);
+        border: 1px solid var(--primary-color);
+        border-radius: 12px;
+        padding: 1rem;
+        width: 100%;
+        color: white;
+        transition: all 0.3s ease;
+    }
+
+    .input-field::placeholder {
+        color: rgba(147, 197, 253, 0.5);
+    }
+
+    .input-field:focus {
+        border-color: var(--baby-blue);
+        box-shadow: 0 0 0 2px rgba(147, 197, 253, 0.25);
+        outline: none;
+    }
+
+    select.input-field {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236B7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+        background-position: right 0.5rem center;
+        background-repeat: no-repeat;
+        background-size: 1.5em 1.5em;
+        padding-right: 2.5rem;
+        color: black !important;
+        background-color: white !important;
+    }
+
+    select.input-field option {
+        color: black !important;
+        background-color: white !important;
+        padding: 0.5rem;
+    }
+
+    .btn-primary {
+        background: var(--primary-color);
+        color: var(--secondary-color);
+        font-weight: bold;
+        padding: 1rem;
+        border-radius: 12px;
+        width: 100%;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background: var(--baby-blue);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(147, 197, 253, 0.4);
+    }
+
+    .image-preview {
+        width: 100%;
+        height: 200px;
+        border-radius: 12px;
+        border: 2px dashed var(--primary-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        position: relative;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .image-preview:hover {
+        border-color: var(--baby-blue);
+    }
+
+    .image-preview img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: none;
+    }
+
+    .image-preview.has-image .upload-prompt {
+        display: none;
+    }
+
+    .image-preview.has-image img {
+        display: block;
+    }
+
+    .upload-prompt {
+        text-align: center;
+    }
+
+    .upload-prompt svg {
+        width: 48px;
+        height: 48px;
+        margin-bottom: 1rem;
+        color: var(--baby-blue);
+    }
+
+    .toggle-switch {
+        position: relative;
+        display: inline-block;
+        width: 60px;
+        height: 34px;
+    }
+
+    .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .toggle-slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(147, 197, 253, 0.1);
+        transition: .4s;
+        border-radius: 34px;
+    }
+
+    .toggle-slider:before {
+        position: absolute;
+        content: "";
+        height: 26px;
+        width: 26px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+    }
+
+    input:checked + .toggle-slider {
+        background: var(--primary-color);
+    }
+
+    input:checked + .toggle-slider:before {
+        transform: translateX(26px);
+    }
+
+    .group-settings {
+        max-height: 0;
+        overflow: hidden;
+        transition: all 0.3s ease-out;
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    .group-settings.active {
+        max-height: 500px;
+        opacity: 1;
+        transform: translateY(0);
+        padding: 1rem;
+        margin-top: 1rem;
+        background: rgba(147, 197, 253, 0.05);
+        border-radius: 12px;
+        border: 1px solid var(--primary-color);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 sm:pt-24 pb-8 sm:pb-12">
+    <div class="glass p-4 sm:p-8">
+        <h2 class="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8 text-center gradient-text">Create New Event</h2>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="mb-4 sm:mb-6 p-3 sm:p-4 rounded-lg bg-blue-500 bg-opacity-20 text-blue-200 text-center text-sm">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('create_event') }}" enctype="multipart/form-data" class="space-y-4 sm:space-y-6">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div>
+                <label class="block text-xs sm:text-sm font-medium text-blue-400 mb-2">Event Image</label>
+                <div class="image-preview h-32 sm:h-48" id="imagePreview">
+                    <div class="upload-prompt">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-8 h-8 sm:w-12 sm:h-12 mx-auto mb-2 text-blue-400">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        <p class="text-xs sm:text-sm text-blue-400">Click to upload event image</p>
+                        <p class="text-xs text-blue-500">Recommended size: 800x600px</p>
+                    </div>
+                    <img id="previewImg" src="#" alt="Preview" class="w-full h-full object-cover">
+                </div>
+                <input type="file" name="image" id="imageInput" accept="image/*" class="hidden">
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                <div>
+                    <label class="block text-xs sm:text-sm font-medium text-blue-400 mb-2">Event Title</label>
+                    <input type="text" name="title" required class="input-field text-sm sm:text-base" placeholder="Enter event title">
+                </div>
+                <div>
+                    <label class="block text-xs sm:text-sm font-medium text-blue-400 mb-2">Category</label>
+                    <select name="category" required class="input-field text-sm sm:text-base">
+                        <option value="">Select Category</option>
+                        <option value="Workshop">Workshop</option>
+                        <option value="Seminar">Seminar</option>
+                        <option value="Cultural">Cultural</option>
+                        <option value="Technical">Technical</option>
+                        <option value="Sports">Sports</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs sm:text-sm font-medium text-blue-400 mb-2">Description</label>
+                <textarea name="description" required class="input-field h-24 sm:h-32 text-sm sm:text-base" placeholder="Enter event description"></textarea>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                <div>
+                    <label class="block text-xs sm:text-sm font-medium text-blue-400 mb-2">Date</label>
+                    <input type="date" name="date" required class="input-field text-sm sm:text-base">
+                </div>
+                <div>
+                    <label class="block text-xs sm:text-sm font-medium text-blue-400 mb-2">Time</label>
+                    <input type="time" name="time" required class="input-field text-sm sm:text-base">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                <div>
+                    <label class="block text-xs sm:text-sm font-medium text-blue-400 mb-2">Venue</label>
+                    <input type="text" name="venue" required class="input-field text-sm sm:text-base" placeholder="Enter venue">
+                </div>
+                <div>
+                    <label class="block text-xs sm:text-sm font-medium text-blue-400 mb-2">Price (₹)</label>
+                    <input type="number" name="price" required class="input-field text-sm sm:text-base" placeholder="Enter price" min="0" step="0.01">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                <div>
+                    <label class="block text-xs sm:text-sm font-medium text-blue-400 mb-2">Total Tickets</label>
+                    <input type="number" name="total_tickets" required class="input-field text-sm sm:text-base" placeholder="Enter total tickets" min="1">
+                </div>
+                <div>
+                    <label class="flex items-center space-x-3">
+                        <span class="text-xs sm:text-sm font-medium text-blue-400">Enable Group Booking</span>
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="groupBooking" name="group_booking">
+                            <span class="toggle-slider"></span>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <div id="groupSettings" class="group-settings">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                    <div>
+                        <label class="block text-xs sm:text-sm font-medium text-blue-400 mb-2">Min Group Size</label>
+                        <input type="number" name="min_group_size" class="input-field text-sm sm:text-base" placeholder="Enter minimum group size" min="2">
+                    </div>
+                    <div>
+                        <label class="block text-xs sm:text-sm font-medium text-blue-400 mb-2">Max Group Size</label>
+                        <input type="number" name="max_group_size" class="input-field text-sm sm:text-base" placeholder="Enter maximum group size" min="2">
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <label class="block text-xs sm:text-sm font-medium text-blue-400 mb-2">Group Discount (%)</label>
+                    <input type="number" name="group_discount" class="input-field text-sm sm:text-base" placeholder="Enter group discount percentage" min="0" max="100" step="0.01">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs sm:text-sm font-medium text-blue-400 mb-2">Payment QR Code</label>
+                <div class="image-preview h-32 sm:h-48" id="qrPreview">
+                    <div class="upload-prompt">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-8 h-8 sm:w-12 sm:h-12 mx-auto mb-2 text-blue-400">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v-4m6 0h-2m2 0v4m-6-4h.01M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                        </svg>
+                        <p class="text-xs sm:text-sm text-blue-400">Click to upload payment QR code</p>
+                        <p class="text-xs text-blue-500">Recommended format: PNG or JPG</p>
+                    </div>
+                    <img id="qrPreviewImg" src="#" alt="QR Preview" class="w-full h-full object-contain">
+                </div>
+                <input type="file" name="payment_qr_file" id="qrInput" accept="image/*" class="hidden">
+            </div>
+
+            <button type="submit" class="btn-primary text-sm sm:text-base">Create Event</button>
+        </form>
+    </div>
+</main>
+
+<script>
+    // Image preview functionality
+    function setupImagePreview(inputId, previewId, previewImgId) {
+        const input = document.getElementById(inputId);
+        const preview = document.getElementById(previewId);
+        const previewImg = document.getElementById(previewImgId);
+
+        preview.addEventListener('click', () => input.click());
+
+        input.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImg.src = e.target.result;
+                    preview.classList.add('has-image');
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+
+    // Set up image previews
+    setupImagePreview('imageInput', 'imagePreview', 'previewImg');
+    setupImagePreview('qrInput', 'qrPreview', 'qrPreviewImg');
+
+    // Group booking toggle functionality
+    const groupBooking = document.getElementById('groupBooking');
+    const groupSettings = document.getElementById('groupSettings');
+
+    groupBooking.addEventListener('change', function() {
+        if (this.checked) {
+            groupSettings.classList.add('active');
+        } else {
+            groupSettings.classList.remove('active');
+        }
+    });
+</script>
+{% endblock %}
+
+

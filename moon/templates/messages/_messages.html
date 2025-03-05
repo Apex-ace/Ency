@@ -1,0 +1,10 @@
+{% for message in messages %}
+<div class="clear-both">
+    <div class="message-bubble {% if message.sender_id == current_user.id %}sent{% else %}received{% endif %}">
+        {{ message.content }}
+        <div class="text-xs mt-1 {% if message.sender_id == current_user.id %}text-gray-800{% else %}text-gray-400{% endif %}">
+            {{ message.timestamp.strftime('%I:%M %p') }}
+        </div>
+    </div>
+</div>
+{% endfor %} 

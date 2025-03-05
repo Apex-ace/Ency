@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h3>Chat with {{ other_user.username }}</h3>
+        </div>
+        <div class="card-body chat-container" id="messageContainer">
+            {% for message in messages %}
+                <div class="message {% if message.sender_id == current_user.id %}sent{% else %}received{% endif %}">
+                    <div class="message-content">
+                        {{ message.content }}
+                    </div>
+                    <small class="message-time">{{ message.timestamp.strftime('%H:%M') }}</small>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="card-footer">
+            <form id="messageForm" class="d-flex">
+                <input type="text" class="form-control me-2" id="messageInput" placeholder="Type your message...">
+                <button type="submit" class="btn btn-primary">Send</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .chat-container {
+        height: 400px;
+        overflow-y: auto;
+        padding: 1rem;
+    }
+    
+    .message {
+        margin-bottom: 1rem;
+        max-width: 70%;
+    }
+    
+    .message.sent {
+        margin-left: auto;
+        background-color: var(--primary-color);
+        color: black;
+        border-radius: 15px 15px 0 15px;
+        padding: 0.5rem 1rem;
+    }
+    
+    .message.received {
+        margin-right: auto;
+        background-color: var(--accent-color);
+        border-radius: 15px 15px 15px 0;
+        padding: 0.5rem 1rem;
+    }
+    
+    .message-time {
+        display: block;
+        font-size: 0.75rem;
+        opacity: 0.7;
+    }
+</style>
+
+<script>
+document.getElementById('messageForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const input = document.getElementById('messageInput');
+    const content = input.value.trim();
+    
+    if (!content) return;
+    
+    fetch(`/send_message/{{ other_user.id }}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({ content: content })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            alert(data.error);
+            return;
+        }
+        
+        const messageContainer = document.getElementById('messageContainer');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'message sent';
+        messageDiv.innerHTML = `
+            <div class="message-content">${data.content}</div>
+            <small class="message-time">${new Date(data.timestamp).toLocaleTimeString()}</small>
+        `;
+        messageContainer.appendChild(messageDiv);
+        messageContainer.scrollTop = messageContainer.scrollHeight;
+        input.value = '';
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to send message');
+    });
+});
+</script>
+{% endblock %} 

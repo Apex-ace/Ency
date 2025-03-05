@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Encypherist</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #60A5FA;
+            --secondary-color: #1E40AF;
+            --accent-color: #1a1a1a;
+            --text-color: #F3F4F6;
+            --background-color: #0a0a0a;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(45deg, var(--secondary-color), var(--accent-color));
+        }
+
+        .glass {
+            background: rgba(0, 255, 0, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--primary-color);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px rgba(0, 255, 0, 0.1);
+        }
+
+        .form-control {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--primary-color);
+            color: var(--text-color);
+            border-radius: 12px;
+            padding: 0.75rem;
+        }
+
+        .form-control:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px var(--primary-color);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: var(--secondary-color);
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 255, 0, 0.3);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <div class="container mx-auto px-4 py-12">
+        <div class="max-w-md mx-auto">
+            <div class="glass p-8">
+                <div class="text-center mb-6">
+                    <img src="{{ url_for('static', filename='images/logo.png') }}" 
+                         alt="Encypherist Logo" 
+                         class="h-16 mx-auto">
+                </div>
+                <h2 class="text-3xl font-bold text-center mb-8" style="color: var(--primary-color)">Register for Encypherist</h2>
+                
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="bg-red-500 bg-opacity-10 border border-red-500 text-red-500 px-4 py-3 rounded-lg mb-6">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <form method="POST" action="{{ url_for('register') }}" class="space-y-6">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    
+                    <div>
+                        <label for="username" class="block text-sm font-medium mb-2" style="color: var(--primary-color)">
+                            Email (Gmail only)
+                        </label>
+                        <input type="email" class="form-control w-full" id="username" name="username" 
+                               required pattern=".*@gmail\.com$" 
+                               title="Please use a Gmail address">
+                        <p class="text-xs mt-1 text-gray-400">Must be a Gmail address</p>
+                    </div>
+
+                    <div>
+                        <label for="password" class="block text-sm font-medium mb-2" style="color: var(--primary-color)">
+                            Password
+                        </label>
+                        <input type="password" class="form-control w-full" id="password" name="password" 
+                               required minlength="6">
+                        <p class="text-xs mt-1 text-gray-400">Minimum 6 characters</p>
+                    </div>
+
+                    <div>
+                        <label for="confirm_password" class="block text-sm font-medium mb-2" style="color: var(--primary-color)">
+                            Confirm Password
+                        </label>
+                        <input type="password" class="form-control w-full" id="confirm_password" name="confirm_password" 
+                               required minlength="6">
+                    </div>
+
+                    <div>
+                        <label for="role" class="block text-sm font-medium mb-2" style="color: var(--primary-color)">
+                            Role
+                        </label>
+                        <select class="form-control w-full" id="role" name="role" required>
+                            <option value="">Select a role</option>
+                            <option value="student">Student</option>
+                            <option value="organizer">Event Organizer</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn-primary w-full" id="submitBtn">
+                        Register
+                        <span class="spinner-border spinner-border-sm hidden" role="status" aria-hidden="true"></span>
+                    </button>
+                </form>
+
+                <p class="text-center mt-6 text-sm">
+                    Already have an account? 
+                    <a href="{{ url_for('login') }}" class="text-green-400 hover:text-green-300 transition-colors">
+                        Login here
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Client-side email validation
+        document.getElementById('username').addEventListener('input', function(e) {
+            const email = e.target.value;
+            if (email && !email.endsWith('@gmail.com')) {
+                e.target.setCustomValidity('Please use a Gmail address');
+            } else {
+                e.target.setCustomValidity('');
+            }
+        });
+
+        // Password strength validation
+        document.getElementById('password').addEventListener('input', function(e) {
+            const password = e.target.value;
+            if (password.length < 6) {
+                e.target.setCustomValidity('Password must be at least 6 characters long');
+            } else {
+                e.target.setCustomValidity('');
+            }
+        });
+
+        // Password confirmation validation
+        document.getElementById('confirm_password').addEventListener('input', function(e) {
+            const password = document.getElementById('password').value;
+            const confirmPassword = e.target.value;
+            if (password !== confirmPassword) {
+                e.target.setCustomValidity('Passwords do not match');
+            } else {
+                e.target.setCustomValidity('');
+            }
+        });
+
+        // Form submission handling
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const submitBtn = document.getElementById('submitBtn');
+            const spinner = submitBtn.querySelector('.spinner-border');
+            submitBtn.disabled = true;
+            spinner.classList.remove('hidden');
+        });
+    </script>
+</body>
+</html>
+

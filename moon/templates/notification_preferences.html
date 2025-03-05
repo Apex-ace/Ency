@@ -1,0 +1,258 @@
+{% extends "base.html" %}
+
+{% block title %}Notification Preferences{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<style>
+    .glass {
+        background: rgba(17, 24, 39, 0.7);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 24px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+
+    .gradient-text {
+        background: linear-gradient(135deg, #e5e7eb 0%, #9ca3af 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .settings-nav-item {
+        transition: all 0.3s ease;
+        border-left: 3px solid transparent;
+    }
+
+    .settings-nav-item:hover {
+        background: rgba(31, 41, 55, 0.7);
+        border-left-color: #e5e7eb;
+    }
+
+    .settings-nav-item.active {
+        background: rgba(31, 41, 55, 0.7);
+        border-left-color: #e5e7eb;
+    }
+
+    .toggle-switch {
+        width: 48px;
+        height: 24px;
+        background: rgba(31, 41, 55, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        position: relative;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .toggle-switch::after {
+        content: '';
+        position: absolute;
+        width: 18px;
+        height: 18px;
+        background: #e5e7eb;
+        border-radius: 50%;
+        top: 2px;
+        left: 2px;
+        transition: all 0.3s ease;
+    }
+
+    .toggle-switch.active {
+        background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
+    }
+
+    .toggle-switch.active::after {
+        transform: translateX(24px);
+    }
+
+    .time-input {
+        background: rgba(31, 41, 55, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        color: white;
+        transition: all 0.3s ease;
+    }
+
+    .time-input:focus {
+        background: rgba(55, 65, 81, 0.7);
+        border-color: #e5e7eb;
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(229, 231, 235, 0.2);
+    }
+
+    .nav-link {
+        position: relative;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .nav-link:hover {
+        background: rgba(31, 41, 55, 0.7);
+    }
+
+    .nav-link.active {
+        background: rgba(31, 41, 55, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .save-button {
+        background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        transition: all 0.3s ease;
+    }
+
+    .save-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        background: linear-gradient(135deg, #4b5563 0%, #374151 100%);
+    }
+
+    .scroll-container {
+        scrollbar-width: thin;
+        scrollbar-color: rgba(55, 65, 81, 0.7) rgba(17, 24, 39, 0.7);
+    }
+
+    .scroll-container::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .scroll-container::-webkit-scrollbar-track {
+        background: rgba(17, 24, 39, 0.7);
+        border-radius: 3px;
+    }
+
+    .scroll-container::-webkit-scrollbar-thumb {
+        background: rgba(55, 65, 81, 0.7);
+        border-radius: 3px;
+    }
+
+    .scroll-container::-webkit-scrollbar-thumb:hover {
+        background: rgba(75, 85, 99, 0.7);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 sm:px-6 pt-20 sm:pt-24">
+    <div class="glass">
+        <div class="flex">
+            <!-- Settings Navigation -->
+            <div class="w-1/4 border-r border-gray-700 p-6">
+                <h2 class="text-xl font-semibold mb-6">Settings</h2>
+                <div class="space-y-2">
+                    <a href="#notifications" class="settings-nav-item active block p-3 rounded-lg">
+                        <i class="fas fa-bell mr-2"></i> Notifications
+                    </a>
+                    <a href="#account" class="settings-nav-item block p-3 rounded-lg">
+                        <i class="fas fa-user-circle mr-2"></i> Account
+                    </a>
+                    <a href="#privacy" class="settings-nav-item block p-3 rounded-lg">
+                        <i class="fas fa-shield-alt mr-2"></i> Privacy
+                    </a>
+                    <a href="#appearance" class="settings-nav-item block p-3 rounded-lg">
+                        <i class="fas fa-paint-brush mr-2"></i> Appearance
+                    </a>
+                </div>
+            </div>
+
+            <!-- Settings Content -->
+            <div class="w-3/4 p-6">
+                <div id="notifications" class="space-y-8">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4">Notification Preferences</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h4 class="font-medium">Email Notifications</h4>
+                                    <p class="text-sm text-gray-400">Receive notifications via email</p>
+                                </div>
+                                <div class="toggle-switch active"></div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h4 class="font-medium">Push Notifications</h4>
+                                    <p class="text-sm text-gray-400">Receive notifications in browser</p>
+                                </div>
+                                <div class="toggle-switch"></div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h4 class="font-medium">SMS Notifications</h4>
+                                    <p class="text-sm text-gray-400">Receive notifications via SMS</p>
+                                </div>
+                                <div class="toggle-switch"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4">Notification Types</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h4 class="font-medium">Event Updates</h4>
+                                    <p class="text-sm text-gray-400">Get notified about event changes and updates</p>
+                                </div>
+                                <div class="toggle-switch active"></div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h4 class="font-medium">New Messages</h4>
+                                    <p class="text-sm text-gray-400">Receive notifications for new messages</p>
+                                </div>
+                                <div class="toggle-switch active"></div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h4 class="font-medium">Booking Confirmations</h4>
+                                    <p class="text-sm text-gray-400">Get notified about booking status changes</p>
+                                </div>
+                                <div class="toggle-switch active"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4">Notification Schedule</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h4 class="font-medium">Quiet Hours</h4>
+                                    <p class="text-sm text-gray-400">Set times when you don't want to receive notifications</p>
+                                </div>
+                                <div class="toggle-switch"></div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium mb-2">Start Time</label>
+                                    <input type="time" class="time-input w-full p-2">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-2">End Time</label>
+                                    <input type="time" class="time-input w-full p-2">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end">
+                        <button class="save-button px-6 py-2 text-white font-medium">
+                            Save Changes
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.querySelectorAll('.toggle-switch').forEach(switch_ => {
+    switch_.addEventListener('click', function() {
+        this.classList.toggle('active');
+    });
+});
+</script>
+{% endblock %} 

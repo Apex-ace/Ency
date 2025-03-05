@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h2>Book Event: {{ event.title }}</h2>
+        </div>
+        <div class="card-body">
+            {% if event.poster_image %}
+            <div class="mb-4">
+                <img src="{{ url_for('static', filename=event.poster_image) }}" 
+                     alt="Event poster" 
+                     class="img-fluid rounded">
+            </div>
+            {% endif %}
+            
+            <form method="POST" class="needs-validation" novalidate>
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                
+                <div class="mb-3">
+                    <label for="name" class="form-label">Full Name</label>
+                    <input type="text" class="form-control" id="name" name="name" required>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="email" name="email" required>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="mobile" class="form-label">Mobile Number</label>
+                    <input type="tel" class="form-control" id="mobile" name="mobile" required>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="branch" class="form-label">Branch</label>
+                    <input type="text" class="form-control" id="branch" name="branch" required>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="year" class="form-label">Year</label>
+                    <select class="form-select" id="year" name="year" required>
+                        <option value="">Select Year</option>
+                        <option value="1">1st Year</option>
+                        <option value="2">2nd Year</option>
+                        <option value="3">3rd Year</option>
+                        <option value="4">4th Year</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Book Now</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %} 

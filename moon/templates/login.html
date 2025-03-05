@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block title %}Login{% endblock %}
+
+{% block extra_head %}
+<style>
+    .glass {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 24px;
+        padding: 2rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    }
+
+    .input-field {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 1rem;
+        width: 100%;
+        color: white;
+        transition: all 0.3s ease;
+        margin-bottom: 0.5rem;
+    }
+
+    .input-field:focus {
+        border-color: var(--baby-blue);
+        box-shadow: 0 0 0 2px rgba(147, 197, 253, 0.25);
+        outline: none;
+    }
+
+    .input-field.error {
+        border-color: rgba(239, 68, 68, 0.5);
+        animation: shake 0.5s;
+    }
+
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
+    }
+
+    .error-message {
+        color: #ef4444;
+        font-size: 0.875rem;
+        margin-bottom: 1rem;
+        display: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex flex-col items-center justify-center relative z-10 px-4">
+    <div class="glass w-full max-w-md">
+        <h2 class="text-3xl font-bold mb-6 text-center gradient-text">Welcome Back!</h2>
+        
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="mb-4 p-4 rounded-lg bg-blue-500 bg-opacity-20 text-blue-200 text-center text-sm">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Regular Email Login Form -->
+        <form method="POST" action="{{ url_for('login') }}" class="space-y-4" id="loginForm" onsubmit="return validateForm()">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            
+            <div>
+                <input type="email" id="username" name="username" required
+                       class="input-field"
+                       pattern="[a-zA-Z0-9._%+-]+@gmail\.com$"
+                       placeholder="Enter your Gmail address">
+                <div class="error-message" id="emailError">Please enter a valid Gmail address (example@gmail.com)</div>
+            </div>
+            
+            <div>
+                <input type="password" id="password" name="password" required
+                       class="input-field"
+                       minlength="6"
+                       placeholder="Enter your password">
+                <div class="error-message" id="passwordError">Password must be at least 6 characters long</div>
+            </div>
+
+            <div class="flex items-center justify-between text-sm mb-6">
+                <label class="flex items-center">
+                    <input type="checkbox" class="mr-2">
+                    <span class="text-gray-300">Remember me</span>
+                </label>
+            </div>
+
+            <button type="submit" class="btn-primary" id="submitBtn">
+                Login
+            </button>
+        </form>
+
+        <p class="mt-8 text-center text-gray-400">
+            Don't have an account? 
+            <a href="{{ url_for('register') }}" class="text-blue-400 hover:text-blue-300">Register here</a>
+        </p>
+    </div>
+</div>
+
+<script>
+    const emailInput = document.getElementById('username');
+    const passwordInput = document.getElementById('password');
+    const emailError = document.getElementById('emailError');
+    const passwordError = document.getElementById('passwordError');
+    const submitBtn = document.getElementById('submitBtn');
+
+    function validateEmail(email) {
+        const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+        return gmailRegex.test(email);
+    }
+
+    function showError(input, errorElement, message) {
+        input.classList.add('error');
+        errorElement.style.display = 'block';
+        errorElement.textContent = message;
+    }
+
+    function hideError(input, errorElement) {
+        input.classList.remove('error');
+        errorElement.style.display = 'none';
+    }
+
+    function validateForm() {
+        let isValid = true;
+
+        // Email validation
+        if (!validateEmail(emailInput.value)) {
+            showError(emailInput, emailError, 'Please enter a valid Gmail address (example@gmail.com)');
+            isValid = false;
+        } else {
+            hideError(emailInput, emailError);
+        }
+
+        // Password validation
+        if (passwordInput.value.length < 6) {
+            showError(passwordInput, passwordError, 'Password must be at least 6 characters long');
+            isValid = false;
+        } else {
+            hideError(passwordInput, passwordError);
+        }
+
+        return isValid;
+    }
+
+    // Real-time validation
+    emailInput.addEventListener('input', () => {
+        if (validateEmail(emailInput.value)) {
+            hideError(emailInput, emailError);
+        } else {
+            showError(emailInput, emailError, 'Please enter a valid Gmail address (example@gmail.com)');
+        }
+    });
+
+    passwordInput.addEventListener('input', () => {
+        if (passwordInput.value.length >= 6) {
+            hideError(passwordInput, passwordError);
+        } else {
+            showError(passwordInput, passwordError, 'Password must be at least 6 characters long');
+        }
+    });
+</script>
+{% endblock %}

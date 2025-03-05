@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}Conversation with {{ other_user.username }}{% endblock %}
+
+{% block extra_head %}
+<style>
+    .glass {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 24px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    }
+
+    .gradient-text {
+        background: linear-gradient(45deg, #3b82f6, #8b5cf6);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .message {
+        max-width: 80%;
+        margin-bottom: 1rem;
+        padding: 0.75rem 1rem;
+        border-radius: 1rem;
+    }
+
+    .message-sent {
+        margin-left: auto;
+        background: linear-gradient(45deg, #3b82f6, #8b5cf6);
+        border-bottom-right-radius: 0.25rem;
+    }
+
+    .message-received {
+        margin-right: auto;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-bottom-left-radius: 0.25rem;
+    }
+
+    .message-input {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: white;
+        padding: 0.75rem 1rem;
+        border-radius: 12px;
+        width: 100%;
+        transition: all 0.3s ease;
+    }
+
+    .message-input:focus {
+        outline: none;
+        border-color: rgba(59, 130, 246, 0.5);
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .btn-send {
+        background: linear-gradient(45deg, #3b82f6, #8b5cf6);
+        border: none;
+        border-radius: 12px;
+        padding: 0.75rem 1.5rem;
+        color: white;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-send:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 sm:px-6 pt-20 sm:pt-24">
+    <div class="glass p-6 mb-20">
+        <div class="flex items-center space-x-4 mb-6">
+            <a href="{{ url_for('messages') }}" class="text-gray-400 hover:text-white transition">
+                ← Back
+            </a>
+            <h1 class="text-xl font-bold gradient-text">{{ other_user.username }}</h1>
+        </div>
+
+        <div class="space-y-4">
+            {% for message in messages %}
+                <div class="message {% if message.sender_id == current_user.id %}message-sent{% else %}message-received{% endif %}">
+                    <p>{{ message.content }}</p>
+                    <p class="text-xs text-gray-400 mt-1">
+                        {{ message.timestamp.strftime('%I:%M %p') }}
+                    </p>
+                </div>
+            {% else %}
+                <div class="text-center py-12">
+                    <p class="text-gray-400">No messages yet. Start the conversation!</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="fixed bottom-0 left-0 right-0 p-6 bg-black bg-opacity-50 backdrop-blur-md">
+        <div class="container mx-auto">
+            <form action="{{ url_for('send_message', user_id=other_user.id) }}" method="POST" class="flex gap-4">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="text" name="content" class="message-input" placeholder="Type your message..." required>
+                <button type="submit" class="btn-send">Send</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Auto-scroll to bottom on page load
+    window.onload = function() {
+        window.scrollTo(0, document.body.scrollHeight);
+    };
+</script>
+{% endblock %} 

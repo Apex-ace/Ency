@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Encypherist - Book Event</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #00FF00;
+            --secondary-color: #000000;
+            --accent-color: #1a1a1a;
+            --text-color: #FFFFFF;
+            --background-color: #0a0a0a;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(45deg, var(--secondary-color), var(--accent-color));
+        }
+
+        .glass {
+            background: rgba(0, 255, 0, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--primary-color);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px rgba(0, 255, 0, 0.1);
+        }
+
+        .gradient-text {
+            background: linear-gradient(45deg, var(--primary-color), #00CC00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .input-field {
+            background: rgba(0, 255, 0, 0.05);
+            border: 1px solid var(--primary-color);
+            border-radius: 12px;
+            padding: 1rem;
+            width: 100%;
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+
+        .input-field::placeholder {
+            color: rgba(0, 255, 0, 0.5);
+        }
+
+        .input-field:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(0, 255, 0, 0.25);
+            outline: none;
+        }
+
+        select.input-field {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2300FF00' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+            color: var(--text-color) !important;
+            background-color: var(--secondary-color) !important;
+        }
+
+        select.input-field option {
+            color: var(--text-color) !important;
+            background-color: var(--secondary-color) !important;
+            padding: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            border: none;
+            border-radius: 12px;
+            padding: 1rem;
+            color: var(--secondary-color);
+            font-weight: 600;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: #00CC00;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0, 255, 0, 0.4);
+        }
+
+        .step {
+            display: none;
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        .step.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .progress-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .progress-step {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            background: rgba(0, 255, 0, 0.05);
+            border: 1px solid var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            position: relative;
+            z-index: 1;
+        }
+
+        .progress-step.active {
+            background: var(--primary-color);
+            border-color: transparent;
+            color: var(--secondary-color);
+        }
+
+        .progress-step.completed {
+            background: #00CC00;
+            border-color: transparent;
+            color: var(--secondary-color);
+        }
+
+        .progress-line {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: rgba(0, 255, 0, 0.1);
+            transform: translateY(-50%);
+        }
+
+        .progress-line-fill {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background: var(--primary-color);
+            transition: width 0.3s ease;
+        }
+
+        .event-summary {
+            background: rgba(0, 255, 0, 0.02);
+            border: 1px solid var(--primary-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <nav class="fixed top-0 left-0 right-0 bg-black bg-opacity-50 backdrop-blur-md z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <a href="{{ url_for('home') }}" class="text-2xl font-bold" style="color: var(--primary-color)">Encypherist</a>
+                <a href="{{ url_for('home') }}" class="text-sm text-gray-300 hover:text-green-400 transition-colors">← Back to Events</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12">
+        <div class="glass p-8">
+            <h2 class="text-3xl font-bold mb-8 text-center gradient-text">Book Event</h2>
+
+            <div class="progress-bar mb-12">
+                <div class="progress-line">
+                    <div class="progress-line-fill" style="width: 0%"></div>
+                </div>
+                <div class="progress-step active" data-step="1">1</div>
+                <div class="progress-step" data-step="2">2</div>
+                <div class="progress-step" data-step="3">3</div>
+            </div>
+
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="mb-6 p-4 rounded-lg bg-red-500 bg-opacity-20 text-red-200 text-center">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form id="bookingForm" method="POST" action="{{ url_for('payment', event_id=event.id) }}" class="space-y-6">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <div class="step active" data-step="1">
+                    <div class="event-summary mb-6">
+                        <h3 class="text-xl font-semibold mb-4">Event Details</h3>
+                        <div class="space-y-4 text-gray-300">
+                            <div class="flex items-center space-x-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                </svg>
+                                <p><span class="text-green-400 font-medium">Event:</span> {{ event.title }}</p>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                                <p><span class="text-green-400 font-medium">Date:</span> {{ event.date.strftime('%B %d, %Y at %I:%M %p') }}</p>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                                <p><span class="text-green-400 font-medium">Location:</span> {{ event.location }}</p>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
+                                </svg>
+                                <p><span class="text-green-400 font-medium">Available Tickets:</span> {{ event.remaining_tickets }}</p>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 8h6m-5 0a3 3 0 110 6H9l3 3m-3-6h6m6 1a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <p><span class="text-green-400 font-medium">Price:</span> ₹{{ "%.2f"|format(event.price) }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-primary" onclick="nextStep(1)">Continue to Personal Details</button>
+                </div>
+
+                <div class="step" data-step="2">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Full Name</label>
+                            <input type="text" name="name" required class="input-field" placeholder="Enter your full name">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Email</label>
+                            <input type="email" name="email" required class="input-field" placeholder="Enter your email">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Mobile Number</label>
+                            <input type="tel" name="mobile" required class="input-field" placeholder="Enter your mobile number">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-2">Branch</label>
+                                <input type="text" name="branch" required class="input-field" placeholder="Your branch">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-2">Year</label>
+                                <select name="year" required class="input-field">
+                                    <option value="">Select Year</option>
+                                    <option value="1st">1st Year</option>
+                                    <option value="2nd">2nd Year</option>
+                                    <option value="3rd">3rd Year</option>
+                                    <option value="4th">4th Year</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex space-x-4 mt-6">
+                        <button type="button" class="btn-primary opacity-50" style="background: rgba(255,255,255,0.1)" onclick="prevStep(2)">Back</button>
+                        <button type="button" class="btn-primary" onclick="nextStep(2)">Continue to Confirmation</button>
+                    </div>
+                </div>
+
+                <div class="step" data-step="3">
+                    <div class="event-summary mb-6">
+                        <h3 class="text-xl font-semibold mb-4">Booking Summary</h3>
+                        <div id="summary" class="space-y-2 text-gray-300">
+                            <!-- Will be filled by JavaScript -->
+                        </div>
+                    </div>
+                    <div class="flex space-x-4">
+                        <button type="button" class="btn-primary opacity-50" style="background: rgba(255,255,255,0.1)" onclick="prevStep(3)">Back</button>
+                        <button type="submit" class="btn-primary">Confirm Booking</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        let currentStep = 1;
+
+        function updateProgress() {
+            const progressLine = document.querySelector('.progress-line-fill');
+            progressLine.style.width = ((currentStep - 1) * 50) + '%';
+
+            document.querySelectorAll('.progress-step').forEach((step, index) => {
+                const stepNum = index + 1;
+                step.classList.remove('active', 'completed');
+                if (stepNum === currentStep) {
+                    step.classList.add('active');
+                } else if (stepNum < currentStep) {
+                    step.classList.add('completed');
+                }
+            });
+        }
+
+        function showStep(step) {
+            document.querySelectorAll('.step').forEach(s => {
+                s.classList.remove('active');
+            });
+            document.querySelector(`.step[data-step="${step}"]`).classList.add('active');
+            currentStep = step;
+            updateProgress();
+        }
+
+        function nextStep(currentStep) {
+            if (currentStep === 2) {
+                // Update summary before showing step 3
+                const form = document.getElementById('bookingForm');
+                const summary = document.getElementById('summary');
+                summary.innerHTML = `
+                    <p><span class="text-green-400">Name:</span> ${form.name.value}</p>
+                    <p><span class="text-green-400">Email:</span> ${form.email.value}</p>
+                    <p><span class="text-green-400">Mobile:</span> ${form.mobile.value}</p>
+                    <p><span class="text-green-400">Branch:</span> ${form.branch.value}</p>
+                    <p><span class="text-green-400">Year:</span> ${form.year.value}</p>
+                `;
+            }
+            showStep(currentStep + 1);
+        }
+
+        function prevStep(currentStep) {
+            showStep(currentStep - 1);
+        }
+
+        // Initialize progress bar
+        updateProgress();
+    </script>
+</body>
+</html>

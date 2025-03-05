@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Encypherist - Profile</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, #000000 0%, #111827 100%);
+            color: white;
+            min-height: 100vh;
+        }
+
+        .glass {
+            background: rgba(17, 24, 39, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #e5e7eb 0%, #9ca3af 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .profile-picture {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 4px solid transparent;
+            background: 
+                linear-gradient(#111827, #111827) padding-box,
+                linear-gradient(135deg, #374151 0%, #1f2937 100%) border-box;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .status-badge {
+            background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            color: #e5e7eb;
+        }
+
+        .booking-card {
+            background: rgba(31, 41, 55, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .booking-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            background: rgba(55, 65, 81, 0.7);
+        }
+
+        .nav-link {
+            position: relative;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: rgba(31, 41, 55, 0.7);
+        }
+
+        .nav-link.active {
+            background: rgba(31, 41, 55, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .scroll-container {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(55, 65, 81, 0.7) rgba(17, 24, 39, 0.7);
+        }
+
+        .scroll-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .scroll-container::-webkit-scrollbar-track {
+            background: rgba(17, 24, 39, 0.7);
+            border-radius: 3px;
+        }
+
+        .scroll-container::-webkit-scrollbar-thumb {
+            background: rgba(55, 65, 81, 0.7);
+            border-radius: 3px;
+        }
+
+        .scroll-container::-webkit-scrollbar-thumb:hover {
+            background: rgba(75, 85, 99, 0.7);
+        }
+
+        .tab-button {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+
+        .tab-button:hover {
+            background: rgba(31, 41, 55, 0.7);
+        }
+
+        .tab-button.active {
+            background: rgba(31, 41, 55, 0.7);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .event-date {
+            background: rgba(17, 24, 39, 0.7);
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .event-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+        }
+
+        .event-status.upcoming {
+            background: rgba(16, 185, 129, 0.2);
+            color: #34d399;
+            border: 1px solid rgba(52, 211, 153, 0.2);
+        }
+
+        .event-status.past {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+            border: 1px solid rgba(248, 113, 113, 0.2);
+        }
+
+        .event-status.cancelled {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+            border: 1px solid rgba(248, 113, 113, 0.2);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: rgba(17, 24, 39, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            max-width: 500px;
+            margin: 100px auto;
+            padding: 20px;
+        }
+
+        .star-rating {
+            display: inline-flex;
+            gap: 0.25rem;
+        }
+
+        .star-rating input {
+            display: none;
+        }
+
+        .star-rating label {
+            cursor: pointer;
+            color: #4B5563;
+            font-size: 1.5rem;
+            transition: color 0.2s;
+        }
+
+        .star-rating label:hover,
+        .star-rating label:hover ~ label,
+        .star-rating input:checked ~ label {
+            color: #FCD34D;
+        }
+
+        .review-card {
+            background: rgba(31, 41, 55, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .star-display {
+            color: #FCD34D;
+        }
+    </style>
+</head>
+<body class="relative">
+    <!-- Background Pattern -->
+    <div class="fixed inset-0 opacity-30">
+        <div class="absolute inset-0" style="background-image: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23333333\' fill-opacity=\'0.4\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 glass">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex justify-between items-center">
+                <h1 class="text-3xl font-bold gradient-text">Encypherist</h1>
+                <div class="flex items-center space-x-8">
+                    <a href="{{ url_for('home') }}" class="nav-link hover:text-gray-300 transition flex items-center">
+                        <i class="fas fa-home mr-2"></i> Events
+                    </a>
+                    <a href="{{ url_for('messages') }}" class="nav-link hover:text-gray-300 transition flex items-center">
+                        <i class="fas fa-envelope mr-2"></i> Messages
+                    </a>
+                    <a href="{{ url_for('notifications') }}" class="nav-link hover:text-gray-300 transition flex items-center">
+                        <i class="fas fa-bell mr-2"></i> Notifications
+                    </a>
+                    <div class="relative group">
+                        <button class="flex items-center space-x-2 hover:text-gray-300 transition p-2 rounded-lg">
+                            <div class="relative">
+                                <img src="{{ url_for('static', filename='uploads/' + current_user.profile_picture) if current_user.profile_picture else 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y' }}"
+                                     alt="Profile"
+                                     class="w-10 h-10 rounded-full border-2 border-gray-700">
+                                <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-400 rounded-full border-2 border-gray-900"></div>
+                            </div>
+                            <span>{{ current_user.username }}</span>
+                            <i class="fas fa-chevron-down text-sm"></i>
+                        </button>
+                        <div class="absolute right-0 mt-2 w-48 rounded-lg shadow-lg glass hidden group-hover:block">
+                            <a href="{{ url_for('profile') }}" class="flex items-center px-4 py-3 hover:bg-gray-700 hover:bg-opacity-50 rounded-t-lg">
+                                <i class="fas fa-user mr-2"></i> Profile
+                            </a>
+                            <a href="{{ url_for('edit_profile') }}" class="flex items-center px-4 py-3 hover:bg-gray-700 hover:bg-opacity-50">
+                                <i class="fas fa-edit mr-2"></i> Edit Profile
+                            </a>
+                            <a href="{{ url_for('notification_preferences') }}" class="flex items-center px-4 py-3 hover:bg-gray-700 hover:bg-opacity-50">
+                                <i class="fas fa-cog mr-2"></i> Settings
+                            </a>
+                            <form action="{{ url_for('logout') }}" method="POST" class="block">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="w-full flex items-center px-4 py-3 hover:bg-gray-700 hover:bg-opacity-50 rounded-b-lg text-red-400 hover:text-red-300">
+                                    <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-6 pt-24 pb-12">
+        <div class="glass">
+            <div class="flex">
+                <!-- Profile Sidebar -->
+                <div class="w-1/4 border-r border-gray-700 p-6">
+                    <div class="text-center">
+                        <div class="relative inline-block">
+                            <img src="{{ url_for('static', filename='uploads/' + user.profile_picture) if user.profile_picture else 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y' }}"
+                                 alt="Profile Picture"
+                                 class="profile-picture object-cover">
+                            <div class="absolute bottom-2 right-2 w-4 h-4 bg-green-400 rounded-full border-4 border-gray-900"></div>
+                        </div>
+                        <h2 class="text-2xl font-semibold mt-4">{{ user.username }}</h2>
+                        <p class="text-gray-400 mt-1">{{ user.email }}</p>
+                        <div class="flex justify-center mt-2">
+                            <span class="status-badge">
+                                <i class="fas fa-graduation-cap mr-1"></i> Student
+                            </span>
+                        </div>
+                    </div>
+                    <div class="mt-8 space-y-2">
+                        <a href="{{ url_for('edit_profile') }}" class="flex items-center p-3 rounded-lg hover:bg-gray-700 hover:bg-opacity-50 transition">
+                            <i class="fas fa-edit w-6"></i>
+                            <span class="ml-3">Edit Profile</span>
+                        </a>
+                        <a href="{{ url_for('notification_preferences') }}" class="flex items-center p-3 rounded-lg hover:bg-gray-700 hover:bg-opacity-50 transition">
+                            <i class="fas fa-bell w-6"></i>
+                            <span class="ml-3">Notification Settings</span>
+                        </a>
+                        <a href="#" class="flex items-center p-3 rounded-lg hover:bg-gray-700 hover:bg-opacity-50 transition">
+                            <i class="fas fa-key w-6"></i>
+                            <span class="ml-3">Change Password</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Bookings Section -->
+                <div class="w-3/4 p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-semibold">My Bookings</h3>
+                        <div class="flex space-x-4">
+                            <button class="tab-button active" data-tab="upcoming">
+                                <i class="fas fa-calendar-alt mr-2"></i> Upcoming
+                            </button>
+                            <button class="tab-button" data-tab="past">
+                                <i class="fas fa-history mr-2"></i> Past
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="scroll-container overflow-y-auto" style="max-height: calc(100vh - 300px);">
+                        <!-- Upcoming Bookings -->
+                        <div id="upcoming" class="space-y-4">
+                            {% set has_upcoming = false %}
+                            {% for booking in bookings %}
+                                {% if booking.event and booking.event.date > now %}
+                                    {% set has_upcoming = true %}
+                                    <div class="booking-card p-4">
+                                        <div class="flex justify-between items-start">
+                                            <div>
+                                                <h4 class="text-lg font-semibold">{{ booking.event.title }}</h4>
+                                                <p class="text-gray-400 mt-1">
+                                                    <i class="fas fa-map-marker-alt mr-1"></i>
+                                                    {{ booking.event.location }}
+                                                </p>
+                                                <div class="flex items-center mt-2 space-x-4">
+                                                    <span class="event-date">
+                                                        <i class="far fa-calendar mr-1"></i>
+                                                        {{ booking.event.date.strftime('%B %d, %Y') }}
+                                                    </span>
+                                                    <span class="event-date">
+                                                        <i class="far fa-clock mr-1"></i>
+                                                        {{ booking.event.date.strftime('%I:%M %p') }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <span class="event-status upcoming">Upcoming</span>
+                                        </div>
+                                        <div class="mt-4 flex justify-between items-center">
+                                            <div class="flex items-center space-x-4">
+                                                <div class="flex items-center">
+                                                    <img src="{{ url_for('static', filename='uploads/' + booking.event.organizer.profile_picture) if booking.event.organizer.profile_picture else 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y' }}"
+                                                         alt="Organizer"
+                                                         class="w-8 h-8 rounded-full border border-gray-700">
+                                                    <span class="ml-2 text-gray-400">{{ booking.event.organizer.username }}</span>
+                                                </div>
+                                                <a href="{{ url_for('conversation', user_id=booking.event.organizer.id) }}" class="text-blue-400 hover:text-blue-300">
+                                                    <i class="fas fa-comment mr-1"></i> Message Organizer
+                                                </a>
+                                            </div>
+                                            <a href="{{ url_for('ticket', event_id=booking.event.id) }}" class="text-blue-400 hover:text-blue-300">
+                                                <i class="fas fa-ticket-alt mr-1"></i> View Ticket
+                                            </a>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                            {% if not has_upcoming %}
+                                <div class="text-center py-8 text-gray-400">
+                                    <i class="fas fa-calendar-alt text-4xl mb-4"></i>
+                                    <p>No upcoming bookings</p>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Past Bookings -->
+                        <div id="past" class="space-y-4 hidden">
+                            {% set has_past = false %}
+                            {% for booking in bookings %}
+                                {% if booking.event and booking.event.date <= now %}
+                                    {% set has_past = true %}
+                                    <div class="booking-card p-4">
+                                        <div class="flex justify-between items-start">
+                                            <div>
+                                                <h4 class="text-lg font-semibold">{{ booking.event.title }}</h4>
+                                                <p class="text-gray-400 mt-1">
+                                                    <i class="fas fa-map-marker-alt mr-1"></i>
+                                                    {{ booking.event.location }}
+                                                </p>
+                                                <div class="flex items-center mt-2 space-x-4">
+                                                    <span class="event-date">
+                                                        <i class="far fa-calendar mr-1"></i>
+                                                        {{ booking.event.date.strftime('%B %d, %Y') }}
+                                                    </span>
+                                                    <span class="event-date">
+                                                        <i class="far fa-clock mr-1"></i>
+                                                        {{ booking.event.date.strftime('%I:%M %p') }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <span class="event-status past">Past</span>
+                                        </div>
+                                        <div class="mt-4 flex justify-between items-center">
+                                            <div class="flex items-center space-x-4">
+                                                <div class="flex items-center">
+                                                    <img src="{{ url_for('static', filename='uploads/' + booking.event.organizer.profile_picture) if booking.event.organizer.profile_picture else 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y' }}"
+                                                         alt="Organizer"
+                                                         class="w-8 h-8 rounded-full border border-gray-700">
+                                                    <span class="ml-2 text-gray-400">{{ booking.event.organizer.username }}</span>
+                                                </div>
+                                                <a href="{{ url_for('conversation', user_id=booking.event.organizer.id) }}" class="text-blue-400 hover:text-blue-300">
+                                                    <i class="fas fa-comment mr-1"></i> Message Organizer
+                                                </a>
+                                            </div>
+                                            <div class="flex items-center space-x-4">
+                                                <button onclick="openReviewModal('{{ booking.event.id }}')" class="text-blue-400 hover:text-blue-300">
+                                                    <i class="fas fa-star mr-1"></i> Write Review
+                                                </button>
+                                                <a href="{{ url_for('ticket', event_id=booking.event.id) }}" class="text-blue-400 hover:text-blue-300">
+                                                    <i class="fas fa-ticket-alt mr-1"></i> View Ticket
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                            {% if not has_past %}
+                                <div class="text-center py-8 text-gray-400">
+                                    <i class="fas fa-history text-4xl mb-4"></i>
+                                    <p>No past bookings</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Review Modal -->
+    <div id="reviewModal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-semibold">Write a Review</h3>
+                <button onclick="closeReviewModal()" class="text-gray-400 hover:text-gray-300">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="reviewForm" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="mb-4">
+                    <label class="block text-gray-300 mb-2">Rating</label>
+                    <div class="star-rating">
+                        <input type="radio" id="star5" name="rating" value="5">
+                        <label for="star5"><i class="fas fa-star"></i></label>
+                        <input type="radio" id="star4" name="rating" value="4">
+                        <label for="star4"><i class="fas fa-star"></i></label>
+                        <input type="radio" id="star3" name="rating" value="3">
+                        <label for="star3"><i class="fas fa-star"></i></label>
+                        <input type="radio" id="star2" name="rating" value="2">
+                        <label for="star2"><i class="fas fa-star"></i></label>
+                        <input type="radio" id="star1" name="rating" value="1">
+                        <label for="star1"><i class="fas fa-star"></i></label>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-300 mb-2">Review</label>
+                    <textarea name="review_text" rows="4" class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-gray-300 focus:outline-none focus:border-blue-500" required></textarea>
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition">
+                    Submit Review
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching functionality
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabs = document.querySelectorAll('#upcoming, #past');
+
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove active class from all buttons and tabs
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                tabs.forEach(tab => tab.classList.add('hidden'));
+
+                // Add active class to clicked button and show corresponding tab
+                button.classList.add('active');
+                document.getElementById(button.dataset.tab).classList.remove('hidden');
+            });
+        });
+
+        function openReviewModal(eventId) {
+            const modal = document.getElementById('reviewModal');
+            const form = document.getElementById('reviewForm');
+            form.action = `/submit_review/${eventId}`;
+            modal.style.display = 'block';
+        }
+
+        function closeReviewModal() {
+            const modal = document.getElementById('reviewModal');
+            modal.style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('reviewModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        // Load reviews for an event
+        function loadEventReviews(eventId) {
+            fetch(`/event_reviews/${eventId}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Update the reviews display
+                    const reviewsContainer = document.getElementById(`reviews-${eventId}`);
+                    if (reviewsContainer) {
+                        let reviewsHtml = `
+                            <div class="mt-4">
+                                <div class="flex items-center mb-2">
+                                    <div class="star-display mr-2">
+                                        ${getStarDisplay(data.average_rating)}
+                                    </div>
+                                    <span class="text-gray-400">(${data.total_reviews} reviews)</span>
+                                </div>
+                        `;
+
+                        data.reviews.forEach(review => {
+                            reviewsHtml += `
+                                <div class="review-card">
+                                    <div class="flex justify-between">
+                                        <span class="font-semibold">${review.username}</span>
+                                        <span class="text-gray-400">${review.created_at}</span>
+                                    </div>
+                                    <div class="star-display my-1">${getStarDisplay(review.rating)}</div>
+                                    <p class="text-gray-300">${review.review_text}</p>
+                                </div>
+                            `;
+                        });
+
+                        reviewsHtml += '</div>';
+                        reviewsContainer.innerHTML = reviewsHtml;
+                    }
+                });
+        }
+
+        function getStarDisplay(rating) {
+            let stars = '';
+            for (let i = 1; i <= 5; i++) {
+                if (i <= rating) {
+                    stars += '<i class="fas fa-star"></i>';
+                } else if (i - 0.5 <= rating) {
+                    stars += '<i class="fas fa-star-half-alt"></i>';
+                } else {
+                    stars += '<i class="far fa-star"></i>';
+                }
+            }
+            return stars;
+        }
+
+        // Load reviews for all past events on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const pastEvents = document.querySelectorAll('[id^="reviews-"]');
+            pastEvents.forEach(container => {
+                const eventId = container.id.split('-')[1];
+                loadEventReviews(eventId);
+            });
+        });
+    </script>
+</body>
+</html> 
