@@ -3,9 +3,11 @@ services:
     name: ency
     env: python
     buildCommand: pip install -r requirements.txt
-    startCommand: cd moon && gunicorn app:app
+    startCommand: gunicorn --chdir moon app:app
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.0
       - key: FLASK_ENV
-        value: production 
+        value: production
+      - key: PYTHONPATH
+        value: moon 

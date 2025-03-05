@@ -1,1 +1,1 @@
-web: cd moon && gunicorn app:app 
+web: gunicorn --chdir moon app:app 
