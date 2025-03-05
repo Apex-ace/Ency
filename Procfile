@@ -1,1 +1,1 @@
-web: gunicorn --chdir moon app:app 
+web: gunicorn wsgi:app 
