@@ -8,4 +8,5 @@ python-dotenv==1.0.1
 qrcode==7.4.2
 Pillow==10.2.0
 supabase==2.3.4
-psycopg2-binary==2.9.9 
+psycopg2-binary==2.9.9
+gunicorn==21.2.0 

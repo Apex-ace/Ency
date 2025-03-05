@@ -1,0 +1,1 @@
+web: cd moon && gunicorn app:app 
